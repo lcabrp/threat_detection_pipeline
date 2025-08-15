@@ -1,0 +1,12 @@
+threat-detection-pipeline/
+├── dags/
+│   └── threat_etl_dag.py
+├── scripts/
+│   ├── extract_logs.py
+│   ├── transform_logs.py
+│   └── load_to_splunk.py
+├── data/
+│   └── sample_logs.json
+├── .env
+├── requirements.txt
+└── README.md
