@@ -209,4 +209,4 @@ __marimo__/
 # Files to exclude
 project_guide.md
 data/*.ndjson
-data/generated_logs.json
+data/generated_logs*.json

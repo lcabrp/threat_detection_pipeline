@@ -16,7 +16,7 @@
     "event": "RDP brute force attempt",
     "severity": "critical",
     "action": "dropped"
-  }
+  },
   {
     "timestamp": "2025-08-13T08:05:05Z",
     "source_ip": "192.168.1.101",

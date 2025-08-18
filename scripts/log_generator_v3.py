@@ -218,8 +218,12 @@ if __name__ == "__main__":
         n_hosts=80,                     # Number of hosts in your simulated network
         n_active_hosts=15,              # "Noisy" (high-activity) hosts
         days=180,                       # 6 months
-        events_per_day=5500,            # Target daily event count (before campaign bursts)
+        events_per_day=5800,            # Target daily event count (before campaign bursts)
         campaign_count=7,               # Number of attack campaigns to plant
     )
+    import time
+    start = time.time()
     generator.generate("data/synthetic_logs.ndjson")
+    end = time.time()
+    print(f"Time taken: {end-start:.2f} seconds")
     print("Synthetic NDJSON log generation completed!")

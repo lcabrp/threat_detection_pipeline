@@ -6,16 +6,17 @@ import datetime as dt
 import ipaddress
 import time
 
-def generate_log_entry() -> dict:
+def generate_log_entry(source_network: str = "192.168.1.0/24", destination_network: str = "10.1.26.0/24", time_in_weeks: int = 12) -> dict:
     """
     Generates a random log entry with a timestamp, source IP, destination IP, port, protocol, event, severity, and action.
 
     Returns:
         dict: A dictionary containing the generated log entry.
     """
-    ip_range = range(2, 255)
-    ports = [22, 80, 443, 3389, 53]
+    # ip_range = range(2, 255)
+    ports = [22, 80, 443, 3389, 53, 110, 143, 993, 995, 8080, 8443, 21, 20, 137, 138, 139, 445, 161, 162, 123, 5060, 5061, 8000, 8001]
     protocols = ["TCP", "UDP"]
+    WEEKS_AGO = time_in_weeks
     events = [
         {"event": "Failed SSH login", "severity": "warning", "actions": ["ignored", "blocked"]},
         {"event": "RDP brute force attempt", "severity": "critical", "actions": ["blocked", "reported"]},
@@ -44,23 +45,27 @@ def generate_log_entry() -> dict:
     if event["event"] == "RDP brute force attempt" and random.random() < 0.5:
         event["severity"] = "high"
     
-    # Generate random timestamp starting two weeks ago
-    start_time = dt.datetime.now(dt.timezone.utc) - dt.timedelta(weeks=2)
+    # Generate random timestamp starting x weeks ago
+    start_time = dt.datetime.now(dt.timezone.utc) - dt.timedelta(weeks=WEEKS_AGO)
 
-    # Using random(slower)
-    random_time = start_time + dt.timedelta(seconds=random.randint(0, int(dt.timedelta(weeks=2).total_seconds())))
-    timestamp = random_time.isoformat(timespec='seconds').replace("+00:00", "Z")
+    # Using random(might be slower)
+    random_time = start_time + dt.timedelta(seconds=random.randint(0, int(dt.timedelta(weeks=WEEKS_AGO).total_seconds())))
+    timestamp = random_time.isoformat(timespec='seconds').replace("+00:00", "Z") # Zulu time(UTC)
 
-    # Using numpy(faster)
+    # Using numpy(expected to be faster when the data grows)
     #random_ts = np.random.uniform(start_time.timestamp(), dt.datetime.now(dt.timezone.utc).timestamp())
     #timestamp = dt.datetime.fromtimestamp(random_ts, tz=dt.timezone.utc).isoformat(timespec='seconds').replace("+00:00", "Z")
 
-    # Generate random IP address from 10.1.26.0/8 range
-    network = ipaddress.ip_network('10.1.26.0/24', strict=False)
-    destination_ip = str(ipaddress.ip_address(random.randint(int(network.network_address), int(network.broadcast_address))))
+    # Generate random IP address from 'source network' range
+    attacker_network = ipaddress.ip_network(source_network, strict=False)
+    source_ip = str(ipaddress.ip_address(random.randint(int(attacker_network.network_address), int(attacker_network.broadcast_address))))
+
+    # Generate random IP address from 'destination network' range
+    corp_network = ipaddress.ip_network(destination_network, strict=False)
+    destination_ip = str(ipaddress.ip_address(random.randint(int(corp_network.network_address), int(corp_network.broadcast_address))))
     return {
         "timestamp": timestamp,
-        "source_ip": f"192.168.1.{random.randrange(2, 255)}",
+        "source_ip": source_ip,
         "destination_ip": destination_ip,
         "port": random.choice(ports),
         "protocol": random.choice(protocols),
@@ -68,7 +73,7 @@ def generate_log_entry() -> dict:
         "severity": event["severity"],
         "action": action
     }
-def generate_logs(n: int = 1000, output_file: str = "data/generated_logs.json") -> None:
+def generate_logs(n: int = 100_000, source_network: str = "192.168.1.0/24", destination_network: str = "10.1.26.0/24", time_in_weeks: int = 12, output_file: str = "data/generated_logs_v1.json") -> None:
     """
     Generates a specified number of log entries and writes them to a JSON file.
 
@@ -88,7 +93,7 @@ def generate_logs(n: int = 1000, output_file: str = "data/generated_logs.json") 
         raise ValueError("output_file must be a string ending with .json")
 
     try:
-        logs = [generate_log_entry() for _ in range(n)]
+        logs = [generate_log_entry(source_network, destination_network, time_in_weeks) for _ in range(n)] # Generate the log entries(list comprehension)
         logs = [log for log in logs if log is not None]  # Filter out any None log entries
         with open(output_file, "w") as f:
             json.dump(logs, f, indent=2)
@@ -97,14 +102,14 @@ def generate_logs(n: int = 1000, output_file: str = "data/generated_logs.json") 
 
 def main():
     """
-    Generates 100,000 log entries and writes them to data/generated_logs.json,
+    Generates 100,000 log entries and writes them to data/generated_logs_v1.json,
     printing the time taken to do so.
 
     Returns:
         None
     """
     start_time = time.time()
-    generate_logs(n=1000_000)
+    generate_logs(n=1_000_000)
     end_time = time.time()
     print(f"Time taken: {end_time - start_time:.2f} seconds")
 

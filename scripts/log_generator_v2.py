@@ -4,9 +4,10 @@ import datetime as dt
 import ipaddress
 from itertools import islice
 
-def generate_bulk_logs(n: int = 100_000, output_file: str = "data/generated_logs.json"):
+def generate_bulk_logs(n: int = 100_000, time_in_weeks: int = 12, output_file: str = "data/generated_logs_v2.json"):
     # --- Predefine static lists ---
-    ports = np.array([22, 80, 443, 3389, 53])
+    ports = np.array([22, 80, 443, 3389, 53, 110, 143, 993, 995, 8080, 8443, 21, 20, 137, 138, 139, 445, 161, 162,
+                      123, 5060, 5061, 8000, 8001])
     protocols = np.array(["TCP", "UDP"])
     events = [
         {"event": "Failed SSH login", "severity": "warning", "actions": ["ignored", "blocked"]},
@@ -25,12 +26,12 @@ def generate_bulk_logs(n: int = 100_000, output_file: str = "data/generated_logs
         {"event": "Potential data exfiltration attempt", "severity": "critical", "actions": ["blocked", "reported"]},
         {"event": "Suspicious network traffic", "severity": "warning", "actions": ["monitored", "scanned"]}
     ]
-    event_indices = np.random.randint(0, len(events), n)
-    chosen_events = [events[i] for i in event_indices]
-    event_names = [e['event'] for e in chosen_events]
-    severities = [e['severity'] for e in chosen_events]
-    actions_list = [e['actions'] for e in chosen_events]
-    actions = [np.random.choice(a) for a in actions_list]
+    event_indices = np.random.randint(0, len(events), n) # numpy.ndarray of integers
+    chosen_events = [events[i] for i in event_indices] # list of dictionaries
+    event_names = [e['event'] for e in chosen_events] # list of strings
+    severities = [e['severity'] for e in chosen_events] # list of strings
+    actions_list = [e['actions'] for e in chosen_events] # list of lists
+    actions = [np.random.choice(a) for a in actions_list] # list of strings
 
     # Dynamic severity adjustment vectorized for "RDP brute force attempt"
     severities = [
@@ -39,7 +40,7 @@ def generate_bulk_logs(n: int = 100_000, output_file: str = "data/generated_logs
     ]
 
     # --- Generate random times, ports, protocols, IPs ---
-    start_time = dt.datetime.now(dt.timezone.utc) - dt.timedelta(weeks=2)
+    start_time = dt.datetime.now(dt.timezone.utc) - dt.timedelta(weeks=time_in_weeks)
     now_time = dt.datetime.now(dt.timezone.utc)
     timestamps = np.random.uniform(start_time.timestamp(), now_time.timestamp(), size=n)
     iso_timestamps = [
@@ -58,7 +59,8 @@ def generate_bulk_logs(n: int = 100_000, output_file: str = "data/generated_logs
     # ports, protocols
     ports_selected = np.random.choice(ports, size=n)
     protocols_selected = np.random.choice(protocols, size=n)
-
+    # --- Assemble the logs ---
+    # Created a list of dictionaries using list comprehension
     logs = [
         {
             "timestamp": iso_timestamps[i],
