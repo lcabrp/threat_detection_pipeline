@@ -2,6 +2,8 @@ import json
 import sqlite3
 import os
 import pandas as pd
+import polars as pl
+import duckdb
 
 def etl_to_sqlite(json_path="data/generated_logs.json", db_path="db/threat_logs.db"):
     """
@@ -50,3 +52,30 @@ def etl_to_sqlite(json_path="data/generated_logs.json", db_path="db/threat_logs.
         print(f"Error: Failed to insert logs into SQLite - {str(e)}")
     finally:
         conn.close()
+
+def etl_to_sqlite_polars(json_path="data/generated_logs.json", db_path="db/threat_logs.db"):
+    """ETL using Polars - faster and more memory efficient"""
+    df = (
+        pl.read_json(json_path)
+        .with_columns([
+            pl.col("timestamp").str.to_datetime(),
+            pl.col("severity").is_in(["warning", "critical"]).alias("is_suspicious")
+        ])
+    )
+    
+    # Write to SQLite using DuckDB for speed
+    conn = duckdb.connect(db_path)
+    conn.execute("CREATE TABLE IF NOT EXISTS threat_logs AS SELECT * FROM df")
+    print(f"Inserted {len(df)} logs using Polars + DuckDB")
+
+def etl_to_sqlite_duckdb(json_path="data/generated_logs.json", db_path="db/threat_logs.db"):
+    """Pure DuckDB approach - fastest for analytical queries"""
+    conn = duckdb.connect(db_path)
+    conn.execute(f"""
+        CREATE TABLE IF NOT EXISTS threat_logs AS
+        SELECT *,
+               severity IN ('warning', 'critical') as is_suspicious,
+               strptime(timestamp, '%Y-%m-%dT%H:%M:%S') as parsed_timestamp
+        FROM read_json_auto('{json_path}')
+    """)
+    print("ETL completed using pure DuckDB")
