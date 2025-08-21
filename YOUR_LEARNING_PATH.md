@@ -179,7 +179,10 @@ pip install -r requirements.txt
 # Run setup validation
 python test_setup.py
 
-# Read the getting started guide
+# IMPORTANT: Understand DAGs first (core concept!)
+cat docs/learning_notes/understanding_dags.md
+
+# Then read the getting started guide
 cat docs/learning_notes/week1_getting_started.md
 ```
 
