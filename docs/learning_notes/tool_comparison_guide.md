@@ -7,10 +7,10 @@
 # Pros ✅
 + Most popular in industry (high job market demand)
 + Rich ecosystem and community
-+ Flexible Python-based workflows
-+ Great UI for monitoring
++ Flexible Python-based workflows (DAGs)
++ Great UI for monitoring workflow execution
 + Strong integration capabilities
-+ Excellent for learning concepts
++ Excellent for learning core DE concepts
 
 # Cons ❌
 - Can be complex to set up in production
@@ -22,6 +22,9 @@
 - Complex workflows with dependencies
 - Teams comfortable with Python
 - Enterprise environments
+
+# Core Concept: DAGs (Directed Acyclic Graphs)
+# See: /app/docs/learning_notes/understanding_dags.md
 ```
 
 ### Alternative Tools to Know
