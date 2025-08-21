@@ -210,4 +210,4 @@ __marimo__/
 project_guide.md
 data/*.ndjson
 data/generated_logs*.json
-data/*.csv
+data/synthetic_logs*.csv

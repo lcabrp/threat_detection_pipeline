@@ -92,3 +92,5 @@ if __name__ == "__main__":
     df = generate_logs(n=10_000_000)
     print(f"Dataset shape: {df.shape}")
     print(f"Memory usage: {df.memory_usage(deep=True).sum() / 1024**2:.1f} MB")
+    del df  # Clean up to free memory
+    print("Log generation complete.")
