@@ -36,6 +36,7 @@ airflow webserver --port 8080
 ## 📚 Learning Path
 
 ### Week 1-2: Airflow Basics
+- [ ] **FIRST: Understand DAGs** (`docs/learning_notes/understanding_dags.md`)
 - [ ] Set up local Airflow environment
 - [ ] Create your first DAG
 - [ ] Implement daily log generation
