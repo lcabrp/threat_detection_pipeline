@@ -2,10 +2,18 @@
 
 ## 🎯 Learning Objectives
 By the end of this week, you'll understand:
+- **DAGs (Directed Acyclic Graphs)** - The foundation concept
 - Core Data Engineering concepts
 - Airflow basics and workflow orchestration
 - Data partitioning strategies
 - Local development setup
+
+## 📚 **REQUIRED READING FIRST**
+Before starting the hands-on work, **read this essential concept**:
+```bash
+cat /app/docs/learning_notes/understanding_dags.md
+```
+**Why this matters**: DAGs are the foundation of everything you'll do in data engineering. Understanding this concept first will make everything else much clearer!
 
 ## 🛠 Setup Instructions (Step by Step)
 
